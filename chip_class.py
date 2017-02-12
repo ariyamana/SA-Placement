@@ -14,12 +14,13 @@ class chip():
         self.net_list = net_list
 
         # initialize object variables:
-        self.area = self.rows * self.cols
+        self.area = self.num_rows * self.num_cols
 
         self.cell_location={}
-        self.reset_cell_location
+        self.reset_cell_location()
 
-
+        # Calculate the current total cost:
+        self.cost_half_param()
 
     def reset_cell_location(self):
 
@@ -30,17 +31,20 @@ class chip():
         indices = random.sample(xrange(self.area), self.num_cells)
         random_locations =  list(range(self.area)[i] for i in indices)
 
+        print random_locations
+
         # resent all locations to their random locations:
         for i in range(self.num_cells):
-            x = floor(random_locations[i]/self.num_cells)
-            y = random_locations[i] - x * self.num_cells
+            y = int(floor(random_locations[i]*1.0 / self.num_cols))
+            x = int(random_locations[i] - y * self.num_cols)
             self.cell_location[i] = (x,y)
 
     def calculate_bounding_box(self, net_ID):
-
+        rows = []
+        cols = []
         for cell in self.net_list[net_ID]:
-            rows.append(self.cell_location[cell][0])
-            cols.append(self.cell_location[cell][1])
+            cols.append(self.cell_location[cell][0])
+            rows.append(self.cell_location[cell][1])
 
         delta_y = max(rows) - min(rows)
         delta_x = max(cols) - min(cols)
@@ -52,7 +56,11 @@ class chip():
         self.total_cost=0
 
         for net in range(self.num_nets):
-            self.total_cost += calculate_bounding_box(net)
+            self.total_cost += self.calculate_bounding_box(net)
 
     def display(self):
+        print 'Current Cell locations:'
         print self.cell_location
+
+        print 'The current cost:'
+        print self.total_cost
