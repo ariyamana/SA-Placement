@@ -1,6 +1,8 @@
 ''' This module imports the input information from an input file.'''
 
-def load_input(filename):
+import chip_class as chip_cls
+
+def load_input(filename, verbose = 0):
 
     # Initializing variables:
     net_list =[]
@@ -30,7 +32,7 @@ def load_input(filename):
     # Loop over the 2nd line to the last line of the file to populate the
     # net list info:
     for net in range(1,num_conns+1):
-        
+
         # Clear the net_list temporary container:
         net_blocks = []
 
@@ -47,17 +49,22 @@ def load_input(filename):
         # Append this net to the master net list:
         net_list.append(net_blocks)
 
+    # Create the chip object using the loaded information:
+    new_chip  = chip_cls.chip(num_rows, num_cols, num_cells, num_conns, net_list)
+
     # Display the imported data:
-    print 'Opened a file for a chip:'
-    print 'number of cells = ', num_cells
-    print 'number of nets = ', num_conns
-    print 'number of rows and columns = ', num_rows,'x', num_cols
-    print 'net list is:'
-    print net_list
+    print 'Openned file successfully.'
 
+    if verbose == 1:
+        print 'Dimension of the chip: ' , num_rows ,'x',num_cols
+        print 'Number of cells = ',num_cells
+        print 'Number of nets = ', num_conns
+        print 'Net connection list:'
+        print net_list
 
+    return new_chip
 
 if __name__ == "__main__":
 
     input_adress = 'Examples/cm138a.txt'
-    load_input(input_adress)
+    chip1 = load_input(input_adress, verbose =1)
