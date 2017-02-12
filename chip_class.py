@@ -20,7 +20,7 @@ class chip():
         self.reset_cell_location()
 
         # Calculate the current total cost:
-        self.cost_half_param()
+        self.cost_half_perim()
 
     def reset_cell_location(self):
 
@@ -51,12 +51,44 @@ class chip():
 
         return delta_x + delta_y
 
-    def cost_half_param(self):
+    def cost_half_perim(self):
 
         self.total_cost=0
 
         for net in range(self.num_nets):
             self.total_cost += self.calculate_bounding_box(net)
+
+    def swap_cells(self,i,j):
+
+        temp_1 = self.cell_location[i]
+        temp_2 = self.cell_location[j]
+
+        self.cell_location[i]= temp_2
+        self.cell_location[j]= temp_1
+
+        #update Cost:
+        self.cost_half_perim()
+
+    def swap_delta_cost(self,i,j):
+        ''' This function calculates the diference in cost after swapping 2
+        cells. In its current form it calculates the whole cost function for all
+        nets at each point. This can be improved a lot by only chaning the cost
+        for the affected cells.'''
+        # store the cost before the swap
+        current_cost = self.total_cost
+
+        # do the swap:
+        self.swap_cells(i,j)
+
+        # store the cost after the swap:
+        future_cost = self.total_cost
+
+        # return everything back to its previous location:
+        self.swap_cells(i,j)
+
+        return future_cost - current_cost
+
+
 
     def display(self):
         print 'Current Cell locations:'
