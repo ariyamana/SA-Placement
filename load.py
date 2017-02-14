@@ -4,6 +4,9 @@ import chip_class as chip_cls
 
 def load_input(filename, verbose = 0):
 
+    print '='*80
+    print 'Loading', filename, '...',
+
     # Initializing variables:
     net_list =[]
     net_blocks = []
@@ -53,14 +56,15 @@ def load_input(filename, verbose = 0):
     new_chip  = chip_cls.chip(num_rows, num_cols, num_cells, num_conns, net_list)
 
     # Display the imported data:
-    print 'Openned file successfully.'
+    print 'Done.'
 
     if verbose == 1:
         print 'Dimension of the chip: ' , num_rows ,'x',num_cols
         print 'Number of cells = ',num_cells
         print 'Number of nets = ', num_conns
-        print 'Net connection list:'
-        print net_list
+        print '.'*80
+
+
 
     return new_chip
 
