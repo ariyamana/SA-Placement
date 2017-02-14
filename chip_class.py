@@ -19,6 +19,8 @@ class chip():
         self.cell_location={}
         self.reset_cell_location()
 
+        self.cell_net_incidence()
+
         # Calculate the current total cost:
         self.cost_half_perim()
 
@@ -31,8 +33,6 @@ class chip():
         indices = random.sample(xrange(self.area), self.num_cells)
         random_locations =  list(range(self.area)[i] for i in indices)
 
-        print random_locations
-
         # resent all locations to their random locations:
         for i in range(self.num_cells):
             y = int(floor(random_locations[i]*1.0 / self.num_cols))
@@ -40,6 +40,7 @@ class chip():
             self.cell_location[i] = (x,y)
 
     def calculate_bounding_box(self, net_ID):
+
         rows = []
         cols = []
         for cell in self.net_list[net_ID]:
@@ -58,6 +59,23 @@ class chip():
         for net in range(self.num_nets):
             self.total_cost += self.calculate_bounding_box(net)
 
+    def subcost_half_perim(self,i,j):
+
+        nets_affected = []
+
+        # Find the nets affected by this change:
+        nets_affected = self.incidence[i] + self.incidence[j]
+
+        nets_affected= list(set(nets_affected))
+
+        current_net_aff_cost = 0
+
+
+        for net in nets_affected:
+            current_net_aff_cost += self.calculate_bounding_box(net)
+
+        return current_net_aff_cost
+
     def swap_cells(self,i,j):
 
         temp_1 = self.cell_location[i]
@@ -66,22 +84,39 @@ class chip():
         self.cell_location[i]= temp_2
         self.cell_location[j]= temp_1
 
-        #update Cost:
-        self.cost_half_perim()
+    def commit_swap_cells(self, i, j):
+
+        #update Cost
+        self.total_cost += self.swap_delta_cost(i,j)
+
+        self.swap_cells(i,j)
+
+        #self.cost_half_perim()
+
+    def cell_net_incidence(self):
+        self.incidence = {}
+
+        for net in range(self.num_nets):
+            for cell in self.net_list[net]:
+                if cell in self.incidence.keys():
+                    self.incidence[cell].append(net)
+                else:
+                    self.incidence[cell] = [net]
 
     def swap_delta_cost(self,i,j):
         ''' This function calculates the diference in cost after swapping 2
         cells. In its current form it calculates the whole cost function for all
         nets at each point. This can be improved a lot by only chaning the cost
         for the affected cells.'''
-        # store the cost before the swap
-        current_cost = self.total_cost
+
+        # store the sub cost according to i and j before the swap
+        current_cost = self.subcost_half_perim(i,j)
 
         # do the swap:
         self.swap_cells(i,j)
 
         # store the cost after the swap:
-        future_cost = self.total_cost
+        future_cost = self.subcost_half_perim(i,j)
 
         # return everything back to its previous location:
         self.swap_cells(i,j)
