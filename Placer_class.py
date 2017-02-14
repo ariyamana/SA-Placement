@@ -122,6 +122,11 @@ class sa_placer_agent():
     def anneal(self):
         self.param_initialization()
 
+        if self.verbose > 0:
+            if self.num_iter % int(floor(0.01 * self.max_iter)) == 0:
+                print '>>> Temp:', self.T,', Iter:', self.num_iter,\
+                ', Cost:' , self.chip.total_cost
+                
         while (self.num_iter <= self.max_iter) and \
          (self.no_change <= 0.05 * self.max_iter):
 
